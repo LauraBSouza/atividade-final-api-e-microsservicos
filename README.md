@@ -13,7 +13,6 @@ Este projeto implementa um sistema completo de agendamento de consultas médicas
 ## 🏗️ Arquiteturas Disponíveis
 
 ### 🏢 Monolito (Porta 8080)
-**Localização**: `backend-main/backend-main/consulta-facil-api/`
 
 Sistema completo e independente que contém todas as funcionalidades em uma única aplicação:
 - ✅ Autenticação e autorização
@@ -24,15 +23,9 @@ Sistema completo e independente que contém todas as funcionalidades em uma úni
 
 **Tecnologias**: Spring Boot, Spring Security, JWT, MySQL
 
-### 🔗 Microsserviços (Portas 8081-8082)
-**Localização**: `microsservicos/migrados/`
+### 🔗 Microsserviços (Porta 8081)
 
-Arquitetura distribuída com serviços especializados:
-
-#### 🔐 Auth Service (Porta 8082)
-- Autenticação e autorização
-- Gestão de usuários e roles
-- Validação de tokens JWT
+Arquitetura distribuída com serviço especializado:
 
 #### 📅 Consulta Service (Porta 8081)
 - Agendamento de consultas
@@ -47,14 +40,14 @@ Arquitetura distribuída com serviços especializados:
 
 ### 1. Baixar os projetos
 
-Clone os repositórios do monolito e dos microsserviços:
+Clone os repositórios do monolito e do microsserviço:
 
 ```bash
 # Clone o repositório do monolito
  git clone <URL_DO_REPOSITORIO_MONOLITO>
 
-# Clone o repositório dos microsserviços
- git clone <URL_DO_REPOSITORIO_MICROSSERVICOS>
+# Clone o repositório do microsserviço
+ git clone <URL_DO_REPOSITORIO_MICROSSERVICO>
 ```
 
 ### 2. Pré-requisitos
@@ -97,16 +90,16 @@ cd <CAMINHO_DO_MICROSSERVICO>
 Cliente → Monolito (8080) → MySQL
 ```
 
-### Microsserviços Integrados
+### Microsserviço Integrado
 ```
-Cliente → Consulta Service (8081) → Auth Service (8082)
+Cliente → Consulta Service (8081)
                 ↓
          Monolito (8080) - Horários
 ```
 
 ### Fluxo de Agendamento (Microsserviços)
-1. **Autenticação**: Cliente obtém token do Auth Service
-2. **Validação**: Consulta Service valida token com Auth Service
+1. **Autenticação**: Cliente obtém token do Monolito
+2. **Validação**: Consulta Service valida token com o Monolito
 3. **Horários**: Consulta Service busca horários disponíveis do Monolito
 4. **Agendamento**: Consulta Service salva a consulta em seu banco H2
 
@@ -119,7 +112,7 @@ Cliente → Consulta Service (8081) → Auth Service (8082)
 - Roles: `ROLE_PACIENTE`, `ROLE_PROFISSIONAL`, `ROLE_ADMIN`
 - Endpoints protegidos por Spring Security
 
-### Microsserviços
+### Microsserviço
 - JWT compartilhado entre serviços
 - ACL (Access Control List) para validação de permissões
 - Integração via RestTemplate
@@ -140,11 +133,8 @@ horarios (id, profissional_id, data_hora_inicio, data_hora_fim, disponivel)
 consultas (id, paciente_id, profissional_id, horario, status)
 ```
 
-### Microsserviços (H2)
+### Microsserviço (H2)
 ```sql
--- Auth Service
-users (id, username, password, roles)
-
 -- Consulta Service
 consultas (id, paciente_id, profissional_id, horario, status)
 ```
@@ -220,8 +210,7 @@ curl -X POST http://localhost:8081/api/consultas \
 - **Banco**: MySQL
 - **Endpoints públicos**: `/horarios/**`, `/api/auth/**`, `/swagger-ui/**`
 
-### Microsserviços
-- **Auth Service**: Porta 8082
+### Microsserviço
 - **Consulta Service**: Porta 8081
 - **Banco**: H2 (arquivo local)
 - **Integração**: RestTemplate para comunicação entre serviços
@@ -232,7 +221,7 @@ curl -X POST http://localhost:8081/api/consultas \
 
 ### Swagger UI
 - **Monolito**: http://localhost:8080/swagger-ui.html
-- **Microsserviços**: http://localhost:8081/swagger-ui.html
+- **Microsserviço**: http://localhost:8081/swagger-ui.html
 
 ### Postman Collection
 - **Monolito**: `docs/postman/consulta-facil-api.postman_collection.json`
