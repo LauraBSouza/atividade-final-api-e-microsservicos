@@ -65,28 +65,29 @@ public class ConsultaController {
                 .orElseThrow(() -> new RuntimeException("Consulta não encontrada"));
     }
 
-    @Operation(
-        summary = "Agendar nova consulta",
-        description = "Cria um novo agendamento de consulta. " +
-                     "Apenas pacientes podem criar agendamentos. " +
-                     "O sistema valida automaticamente: " +
-                     "- Disponibilidade do horário " +
-                     "- Conflitos com outras consultas " +
-                     "- Se o horário está no futuro " +
-                     "- Se o profissional existe"
-    )
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Consulta agendada com sucesso",
-                    content = @Content(schema = @Schema(implementation = ConsultaDTO.class))),
-        @ApiResponse(responseCode = "400", description = "Dados inválidos ou horário indisponível"),
-        @ApiResponse(responseCode = "403", description = "Apenas pacientes podem agendar consultas"),
-        @ApiResponse(responseCode = "401", description = "Token de autenticação inválido")
-    })
-    @PreAuthorize("hasRole('PACIENTE')")
-    @PostMapping
-    public ConsultaDTO criar(@Parameter(description = "Dados da consulta a ser agendada") @RequestBody @Valid ConsultaDTO consulta) {
-        return consultaService.salvar(consulta);
-    }
+    // @Operation(
+    //     summary = "Agendar nova consulta",
+    //     description = "Cria um novo agendamento de consulta. " +
+    //                  "Apenas pacientes podem criar agendamentos. " +
+    //                  "O sistema valida automaticamente: " +
+    //                  "- Disponibilidade do horário " +
+    //                  "- Conflitos com outras consultas " +
+    //                  "- Se o horário está no futuro " +
+    //                  "- Se o profissional existe"
+    // )
+    // @ApiResponses(value = {
+    //     @ApiResponse(responseCode = "201", description = "Consulta agendada com sucesso",
+    //                 content = @Content(schema = @Schema(implementation = ConsultaDTO.class))),
+    //     @ApiResponse(responseCode = "400", description = "Dados inválidos ou horário indisponível"),
+    //     @ApiResponse(responseCode = "403", description = "Apenas pacientes podem agendar consultas"),
+    //     @ApiResponse(responseCode = "401", description = "Token de autenticação inválido")
+    // })
+    // @PreAuthorize("hasRole('PACIENTE')")
+    // @PostMapping
+    // public ConsultaDTO criar(@Parameter(description = "Dados da consulta a ser agendada") @RequestBody @Valid ConsultaDTO consulta) {
+    //     return consultaService.salvar(consulta);
+    // }
+    // Agendamento de consultas agora é feito exclusivamente pelo microsserviço Consulta Service.
 
     @Operation(
         summary = "Cancelar consulta",

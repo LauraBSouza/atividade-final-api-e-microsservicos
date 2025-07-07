@@ -23,7 +23,7 @@ Sistema completo e independente que contém todas as funcionalidades em uma úni
 
 **Tecnologias**: Spring Boot, Spring Security, JWT, MySQL
 
-### 🔗 Microsserviços (Portas 8081-8083)
+### 🔗 Microsserviços (Portas 8081-8082)
 **Localização**: `microsservicos/migrados/`
 
 Arquitetura distribuída com serviços especializados:
@@ -32,11 +32,6 @@ Arquitetura distribuída com serviços especializados:
 - Autenticação e autorização
 - Gestão de usuários e roles
 - Validação de tokens JWT
-
-#### 👤 User Service (Porta 8083)
-- Gestão de perfis de usuários
-- Informações de pacientes e profissionais
-- Validação de permissões
 
 #### 📅 Consulta Service (Porta 8081)
 - Agendamento de consultas
@@ -76,10 +71,6 @@ spring.jpa.hibernate.ddl-auto=update
 cd microsservicos/migrados/auth-service-main/auth-service-main
 ./mvnw spring-boot:run
 
-# User Service  
-cd microsservicos/migrados/user-service
-./mvnw spring-boot:run
-
 # Consulta Service
 cd microsservicos/migrados/consulta-service
 ./mvnw spring-boot:run
@@ -103,7 +94,7 @@ Cliente → Monolito (8080) → MySQL
 
 ### Microsserviços Integrados
 ```
-Cliente → Consulta Service (8081) → User Service (8083) → Auth Service (8082)
+Cliente → Consulta Service (8081) → Auth Service (8082)
                 ↓
          Monolito (8080) - Horários
 ```
@@ -111,9 +102,8 @@ Cliente → Consulta Service (8081) → User Service (8083) → Auth Service (80
 ### Fluxo de Agendamento (Microsserviços)
 1. **Autenticação**: Cliente obtém token do Auth Service
 2. **Validação**: Consulta Service valida token com Auth Service
-3. **Permissões**: Consulta Service verifica permissões com User Service
-4. **Horários**: Consulta Service busca horários disponíveis do Monolito
-5. **Agendamento**: Consulta Service salva a consulta em seu banco H2
+3. **Horários**: Consulta Service busca horários disponíveis do Monolito
+4. **Agendamento**: Consulta Service salva a consulta em seu banco H2
 
 ---
 
@@ -149,9 +139,6 @@ consultas (id, paciente_id, profissional_id, horario, status)
 ```sql
 -- Auth Service
 users (id, username, password, roles)
-
--- User Service  
-usuarios (id, nome, email, papel)
 
 -- Consulta Service
 consultas (id, paciente_id, profissional_id, horario, status)
@@ -224,19 +211,6 @@ curl -X POST http://localhost:8080/horarios \
 
 ### 4. Agendar Consulta
 
-**Monolito**:
-```bash
-curl -X POST http://localhost:8080/consultas \
-  -H "Authorization: Bearer <token_paciente>" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "horario": "2025-07-08T14:00:00",
-    "pacienteId": 3,
-    "profissionalId": 2,
-    "statusConsulta": "AGENDADA"
-  }'
-```
-
 **Microsserviços**:
 ```bash
 curl -X POST http://localhost:8081/api/consultas \
@@ -261,7 +235,6 @@ curl -X POST http://localhost:8081/api/consultas \
 
 ### Microsserviços
 - **Auth Service**: Porta 8082
-- **User Service**: Porta 8083  
 - **Consulta Service**: Porta 8081
 - **Banco**: H2 (arquivo local)
 - **Integração**: RestTemplate para comunicação entre serviços
@@ -272,7 +245,7 @@ curl -X POST http://localhost:8081/api/consultas \
 
 ### Swagger UI
 - **Monolito**: http://localhost:8080/swagger-ui.html
-- **Microsserviços**: Cada serviço tem sua própria documentação
+- **Microsserviços**: http://localhost:8081/swagger-ui.html
 
 ### Postman Collection
 - **Monolito**: `docs/postman/consulta-facil-api.postman_collection.json`
@@ -319,8 +292,8 @@ Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalh
 
 ## 👥 Autores
 
-- **Equipe de Desenvolvimento** - *Trabalho inicial* - [IFSP]
+- **Arthur, Gabriel, Laura e Matheus**  - [IFSP]
 
 ---
 
-© 2025 - Sistema de Agendamento de Consultas - Monolito e Microsserviços 
+© 2025 - Consulta Fácil - Monolito e Microsserviços 
