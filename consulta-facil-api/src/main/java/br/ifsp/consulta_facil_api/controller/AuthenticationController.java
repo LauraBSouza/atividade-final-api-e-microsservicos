@@ -1,6 +1,7 @@
 package br.ifsp.consulta_facil_api.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,12 +23,16 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @RestController
 @RequestMapping("/api/auth")
 @Tag(name = "Autenticação", description = "Endpoints para autenticação e geração de tokens JWT")
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     public AuthenticationController(AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
@@ -46,9 +51,12 @@ public class AuthenticationController {
         @ApiResponse(responseCode = "400", description = "Dados de entrada inválidos")
     })
     @PostMapping("authenticate")
-    public String authenticate(@Parameter(description = "Credenciais de autenticação (email e senha)") @RequestBody @Valid AuthenticationDTO request) {
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                request.getEmail(), request.getSenha());
+    public String authenticate(@RequestBody @Valid AuthenticationDTO request) {
+        System.out.println("[AUTH] Tentando autenticar: " + request.getEmail());
+        Authentication authentication = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(request.getEmail(), request.getSenha())
+        );
+        System.out.println("[AUTH] Autenticação bem-sucedida para: " + request.getEmail());
         return authenticationService.authenticate(authentication);
     }
 

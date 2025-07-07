@@ -6,13 +6,13 @@ C:\Users\Laura\Downloads\projetos\microsservicos\migrados\consulta-service\src\m
 C:\Users\Laura\Downloads\projetos\microsservicos\migrados\consulta-service\src\main\java\br\edu\ifsp\consulta\dto\ConsultaDTO.java
 C:\Users\Laura\Downloads\projetos\microsservicos\migrados\consulta-service\src\main\java\br\edu\ifsp\consulta\model\Consulta.java
 C:\Users\Laura\Downloads\projetos\microsservicos\migrados\consulta-service\src\main\java\br\edu\ifsp\consulta\model\Horario.java
+C:\Users\Laura\Downloads\projetos\microsservicos\migrados\consulta-service\src\main\java\br\edu\ifsp\consulta\dto\PageResponseDTO.java
 C:\Users\Laura\Downloads\projetos\microsservicos\migrados\consulta-service\src\main\java\br\edu\ifsp\consulta\config\GlobalExceptionHandler.java
 C:\Users\Laura\Downloads\projetos\microsservicos\migrados\consulta-service\src\main\java\br\edu\ifsp\consulta\config\ModelMapperConfig.java
 C:\Users\Laura\Downloads\projetos\microsservicos\migrados\consulta-service\src\main\java\br\edu\ifsp\consulta\dto\HorarioDTO.java
 C:\Users\Laura\Downloads\projetos\microsservicos\migrados\consulta-service\src\main\java\br\edu\ifsp\consulta\repository\HorarioRepository.java
 C:\Users\Laura\Downloads\projetos\microsservicos\migrados\consulta-service\src\main\java\br\edu\ifsp\consulta\service\HorarioService.java
 C:\Users\Laura\Downloads\projetos\microsservicos\migrados\consulta-service\src\main\java\br\edu\ifsp\consulta\acl\MonolitoACL.java
-C:\Users\Laura\Downloads\projetos\microsservicos\migrados\consulta-service\src\main\java\br\edu\ifsp\consulta\controller\HorarioController.java
 C:\Users\Laura\Downloads\projetos\microsservicos\migrados\consulta-service\src\main\java\br\edu\ifsp\consulta\config\RestTemplateConfig.java
 C:\Users\Laura\Downloads\projetos\microsservicos\migrados\consulta-service\src\main\java\br\edu\ifsp\consulta\config\SecurityConfig.java
 C:\Users\Laura\Downloads\projetos\microsservicos\migrados\consulta-service\src\main\java\br\edu\ifsp\consulta\model\StatusConsulta.java

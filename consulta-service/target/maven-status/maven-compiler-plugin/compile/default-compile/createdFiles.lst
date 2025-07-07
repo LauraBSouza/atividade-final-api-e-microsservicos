@@ -14,7 +14,6 @@ br\edu\ifsp\consulta\repository\HorarioRepository.class
 br\edu\ifsp\consulta\model\Horario.class
 br\edu\ifsp\consulta\config\GlobalExceptionHandler.class
 br\edu\ifsp\consulta\dto\UserInfoDTO.class
-br\edu\ifsp\consulta\controller\HorarioController.class
 br\edu\ifsp\consulta\ConsultaServiceApplication.class
 br\edu\ifsp\consulta\dto\ConsultaDTO.class
 br\edu\ifsp\consulta\config\GlobalExceptionHandler$ValidationErrorResponse.class

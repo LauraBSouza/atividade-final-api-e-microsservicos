@@ -12,6 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
+import br.edu.ifsp.consulta.dto.HorarioDTO;
+import br.edu.ifsp.consulta.dto.PageResponseDTO;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -35,6 +43,12 @@ public class ConsultaService {
 
     @Autowired
     private MonolitoACL monolitoACL;
+    
+    @Autowired
+    private RestTemplate restTemplate;
+    
+    @Value("${monolito.base-url:http://localhost:8080}")
+    private String monolitoBaseUrl;
 
     public Page<Consulta> listar(Pageable pageable) {
         logger.info("Listando consultas com paginação: {}", pageable);
@@ -64,32 +78,76 @@ public class ConsultaService {
             logger.warn("Tentativa de agendamento com conflito - Profissional: {}, Horário: {}", profissionalId, horarioConsulta);
             throw new RuntimeException("Já existe uma consulta agendada com este profissional neste horário.");
         }
-        boolean horarioDisponivel = horarioRepository
-            .findByProfissionalIdAndDisponivelTrue(profissionalId, Pageable.unpaged())
+        
+        // Buscar horários disponíveis do monolito
+        List<HorarioDTO> horariosDisponiveis = buscarHorariosDisponiveisDoMonolito(profissionalId);
+        logger.info("Horários disponíveis encontrados para profissional {}: {}", profissionalId, horariosDisponiveis.size());
+        horariosDisponiveis.forEach(h -> 
+            logger.info("Horário disponível: ID={}, Início={}, Fim={}, Disponível={}", 
+                       h.getId(), h.getDataHoraInicio(), h.getDataHoraFim(), h.isDisponivel()));
+        
+        boolean horarioDisponivel = horariosDisponiveis
             .stream()
-            .anyMatch(h -> 
-                horarioConsulta.isEqual(h.getDataHoraInicio()) ||
-                (horarioConsulta.isAfter(h.getDataHoraInicio()) && horarioConsulta.isBefore(h.getDataHoraFim()))
-            );
+            .anyMatch(h -> {
+                boolean dentroDoIntervalo = horarioConsulta.isEqual(h.getDataHoraInicio()) ||
+                    (horarioConsulta.isAfter(h.getDataHoraInicio()) && horarioConsulta.isBefore(h.getDataHoraFim()));
+                logger.info("Comparando horário {} com intervalo [{}, {}]: {}", 
+                           horarioConsulta, h.getDataHoraInicio(), h.getDataHoraFim(), dentroDoIntervalo);
+                return dentroDoIntervalo;
+            });
+        
         if (!horarioDisponivel) {
             logger.warn("Tentativa de agendamento em horário indisponível - Profissional: {}, Horário: {}", profissionalId, horarioConsulta);
             throw new RuntimeException("O horário selecionado não está disponível para este profissional.");
         }
+        
         consulta = consultaRepository.save(consulta);
         logger.info("Consulta salva com sucesso. ID: {}", consulta.getId());
-        horarioRepository.findByProfissionalIdAndDisponivelTrue(profissionalId, Pageable.unpaged())
-            .stream()
-            .filter(h -> 
-                horarioConsulta.isEqual(h.getDataHoraInicio()) ||
-                (horarioConsulta.isAfter(h.getDataHoraInicio()) && horarioConsulta.isBefore(h.getDataHoraFim()))
-            )
-            .findFirst()
-            .ifPresent(horario -> {
-                horario.setDisponivel(false);
-                horarioRepository.save(horario);
-                logger.debug("Horário marcado como indisponível. ID: {}", horario.getId());
-            });
+        
+        // Marcar horário como indisponível no monolito
+        marcarHorarioComoIndisponivelNoMonolito(profissionalId, horarioConsulta);
+        
         return consulta;
+    }
+    
+    private List<HorarioDTO> buscarHorariosDisponiveisDoMonolito(Long profissionalId) {
+        try {
+            String url = monolitoBaseUrl + "/horarios/profissionais/" + profissionalId + "/horarios?size=100";
+            ResponseEntity<PageResponseDTO<HorarioDTO>> response = restTemplate.exchange(
+                url, HttpMethod.GET, new HttpEntity<>(new HttpHeaders()), 
+                new org.springframework.core.ParameterizedTypeReference<PageResponseDTO<HorarioDTO>>() {}
+            );
+            
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                logger.info("Resposta do monolito: {} horários encontrados", response.getBody().getContent().size());
+                return response.getBody().getContent();
+            } else {
+                logger.warn("Erro ao buscar horários do monolito. Status: {}", response.getStatusCode());
+                return List.of();
+            }
+        } catch (Exception e) {
+            logger.error("Erro ao buscar horários disponíveis do monolito: {}", e.getMessage());
+            return List.of();
+        }
+    }
+    
+    private void marcarHorarioComoIndisponivelNoMonolito(Long profissionalId, LocalDateTime horarioConsulta) {
+        try {
+            // Buscar o horário específico e marcá-lo como indisponível
+            List<HorarioDTO> horarios = buscarHorariosDisponiveisDoMonolito(profissionalId);
+            horarios.stream()
+                .filter(h -> horarioConsulta.isEqual(h.getDataHoraInicio()) ||
+                    (horarioConsulta.isAfter(h.getDataHoraInicio()) && horarioConsulta.isBefore(h.getDataHoraFim())))
+                .findFirst()
+                .ifPresent(horario -> {
+                    horario.setDisponivel(false);
+                    String url = monolitoBaseUrl + "/horarios/" + horario.getId();
+                    restTemplate.put(url, horario);
+                    logger.debug("Horário marcado como indisponível no monolito. ID: {}", horario.getId());
+                });
+        } catch (Exception e) {
+            logger.error("Erro ao marcar horário como indisponível no monolito: {}", e.getMessage());
+        }
     }
 
     public void deletar(Long id) {
