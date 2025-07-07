@@ -58,7 +58,7 @@ cd backend-main/backend-main/consulta-facil-api
 
 **Configuração do banco** (MySQL):
 ```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/clinica_db
+spring.datasource.url=jdbc:mysql://localhost:3306/consulta_facil_db
 spring.datasource.username=seu_usuario
 spring.datasource.password=sua_senha
 spring.jpa.hibernate.ddl-auto=update
@@ -74,13 +74,6 @@ cd microsservicos/migrados/auth-service-main/auth-service-main
 # Consulta Service
 cd microsservicos/migrados/consulta-service
 ./mvnw spring-boot:run
-```
-
-### 3. Script de Inicialização (PowerShell)
-
-```powershell
-# Executar o script para inicializar dados padrão
-./inicializar-sistema.ps1
 ```
 
 ---
