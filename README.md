@@ -4,8 +4,9 @@
 
 Este projeto implementa um sistema completo de agendamento de consultas médicas com duas arquiteturas:
 
-1. **Monolito** - Sistema completo e independente
-2. **Microsserviços** - Arquitetura distribuída com serviços especializados
+1. **Monolito** - Sistema completo e independente, responsável também pelo cadastro e autenticação de usuários.
+2. **Microsserviços** - Arquitetura distribuída com um serviço especializado:
+   - **Consulta Service:** Responsável por todas as operações de consultas médicas (agendar, cancelar, listar, etc.). Não realiza autenticação ou registro de usuários.
 
 ---
 
@@ -42,17 +43,31 @@ Arquitetura distribuída com serviços especializados:
 
 ---
 
-## 🚀 Como Executar
+## 📋 Como Executar
 
-### Pré-requisitos
+### 1. Baixar os projetos
+
+Clone os repositórios do monolito e dos microsserviços:
+
+```bash
+# Clone o repositório do monolito
+ git clone <URL_DO_REPOSITORIO_MONOLITO>
+
+# Clone o repositório dos microsserviços
+ git clone <URL_DO_REPOSITORIO_MICROSSERVICOS>
+```
+
+### 2. Pré-requisitos
 - Java 17+
 - Maven
 - MySQL (para o monolito)
 
-### 1. Executar o Monolito
+### 3. Executar o Monolito
+
+No terminal, acesse o diretório do monolito e inicie a aplicação:
 
 ```bash
-cd backend-main/backend-main/consulta-facil-api
+cd <CAMINHO_DO_MONOLITO>
 ./mvnw spring-boot:run
 ```
 
@@ -64,15 +79,12 @@ spring.datasource.password=sua_senha
 spring.jpa.hibernate.ddl-auto=update
 ```
 
-### 2. Executar os Microsserviços
+### 4. Executar o Microsserviço Consulta Service
+
+Abra um novo terminal, acesse o diretório do microsserviço Consulta Service e inicie a aplicação:
 
 ```bash
-# Auth Service
-cd microsservicos/migrados/auth-service-main/auth-service-main
-./mvnw spring-boot:run
-
-# Consulta Service
-cd microsservicos/migrados/consulta-service
+cd <CAMINHO_DO_MICROSSERVICO>
 ./mvnw spring-boot:run
 ```
 
@@ -143,21 +155,10 @@ consultas (id, paciente_id, profissional_id, horario, status)
 
 ### 1. Cadastrar Usuários
 
-**Monolito**:
+O cadastro de usuários deve ser feito exclusivamente pelo monolito:
+
 ```bash
 curl -X POST http://localhost:8080/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "nome": "João Paciente",
-    "email": "joao@email.com", 
-    "senha": "123456",
-    "papel": "PACIENTE"
-  }'
-```
-
-**Microsserviços**:
-```bash
-curl -X POST http://localhost:8082/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "nome": "João Paciente",
@@ -169,7 +170,8 @@ curl -X POST http://localhost:8082/api/auth/register \
 
 ### 2. Fazer Login
 
-**Monolito**:
+A autenticação (login) também é feita apenas pelo monolito:
+
 ```bash
 curl -X POST http://localhost:8080/api/auth/authenticate \
   -H "Content-Type: application/json" \
@@ -179,15 +181,7 @@ curl -X POST http://localhost:8080/api/auth/authenticate \
   }'
 ```
 
-**Microsserviços**:
-```bash
-curl -X POST http://localhost:8082/api/auth/authenticate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "joao@email.com",
-    "senha": "123456"
-  }'
-```
+> O token JWT retornado deve ser utilizado nas requisições ao Consulta Service, se necessário.
 
 ### 3. Cadastrar Horários (Monolito)
 
@@ -274,12 +268,6 @@ curl -X POST http://localhost:8081/api/consultas \
 3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
 4. Push para a branch (`git push origin feature/AmazingFeature`)
 5. Abra um Pull Request
-
----
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
 
 ---
 
