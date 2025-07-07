@@ -105,8 +105,8 @@ Cliente → Consulta Service (8081) → Auth Service (8082)
 ```
 
 ### Fluxo de Agendamento (Microsserviços)
-1. **Autenticação**: Cliente obtém token do Auth Service
-2. **Validação**: Consulta Service valida token com Auth Service
+1. **Autenticação**: Cliente obtém token do Monolito
+2. **Validação**: Consulta Service valida token com o Monolito
 3. **Horários**: Consulta Service busca horários disponíveis do Monolito
 4. **Agendamento**: Consulta Service salva a consulta em seu banco H2
 
